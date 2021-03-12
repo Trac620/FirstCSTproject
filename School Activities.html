@@ -1,0 +1,328 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>After School Activities</title>
+    <!-- Import Script to run Vue-->
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+    <link rel="stylesheet"href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
+    <!-- Latest compiled and minified CSS -->
+
+    <script src= "product.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+    </style>
+
+</head>
+<body class="container">
+    <!-- Create the DOM space for vue to run in-->
+    <div id="app">
+        <h2 v-text="sitename"></h2>
+        <div class="row">
+            <div class="col-md-4 col-lg-3 col-12 p-2">
+                <header>
+                    <button v-on:click="showCheckout" v-if="cart.length >= 1">
+                        {{ cartItemCount }}
+                        <span class="fa fa-cart-plus"></span> Checkout
+                    </button> 
+                    <br>
+                    <div v-if="showProduct == true">
+                        Sort By:
+                        <div>
+                            <input type="radio" id="subject" value="subject" name="sortBy" v-model="sortBy">
+                            <label for="subject">Subject</label>
+                        </div> 
+                        <div>
+                            <input type="radio" id="location" value="location" name="sortBy" v-model="sortBy">
+                            <label for="location">Location</label>
+                        </div> 
+                        <div>
+                            <input type="radio" id="price" value="price" name="sortBy" v-model="sortBy">
+                            <label for="price">Price</label>
+                        </div> 
+                        <div>
+                            <input type="radio" id="availability" value="availability" name="sortBy" v-model="sortBy" />
+                            <label for="availability">Availability</label>
+                        </div> 
+                        <br>
+    
+                        Order By: 
+                        <input type="radio" id="orderBy" value="ascending" name="orderBy" v-model="orderBy"> Ascending
+                        <input type="radio" id="orderBy" value="descending" name="orderBy" v-model="orderBy"> Descending
+                    </div>
+                </header>
+            </div>
+
+            <div class="col-md-8 col-lg-9 col-12 p-2">
+                <div v-if="showProduct == true">
+                    <main class="productContainer"> 
+                        <div class="row">
+                            <div class="col-lg-3 col-md-4 col-sm-6 col-12 p-2 m-2" v-for="product in filteredProducts" :key="product.id">  
+                                <div class="p-2">
+                                    <figure>
+                                        <img v-bind:src="product.image" class="img-fluid img-responsive" width="200">
+                                    </figure>
+                                    <h2 v-text ="product.title"></h2>
+                                    <p v-html="product.description"></p>
+                                    <!-- The double curly brackets is the shorter version of v-text -->
+                                    <p><b>Subject:</b> {{product.subject}}</p>
+                                    <p><b>Location:</b> {{product.location}}</p>
+                                    <p><b>Price:</b> ${{product.price}}</p>
+                                    <p><b>Available Spaces:</b> {{product.space}}</p> 
+                                    <button v-on:click="addToCart(product)" v-show="product.space > 0">Add to Cart</button>
+                                </div>
+                                <br>
+                                
+                            </div>
+                        </div>
+                    </main>
+                    </div>
+        
+                    <div v-else>
+        
+                        <!-- Cart Container -->
+                        <main class="productContainer" v-show="checkout == false"> 
+                            <div v-for="product in cart">  
+                            <figure>
+                                <img v-bind:src="product.image" class="img-fluid img-responsive" width="200">
+                            </figure>
+                            <h2 v-text ="product.title"></h2>
+                            <p v-html="product.description"></p>
+                        <!-- The double curly brackets is the shorter version of v-text -->
+                            <p><b>Subject:</b> {{product.subject}}</p>
+                            <p><b>Location:</b> {{product.location}}</p>
+                            <p><b>Price:</b> ${{product.price}}</p>
+                            <p><b>Available Spaces:</b> {{product.space}}</p> 
+                            <button v-on:click="removeFromCart(product)">Remove From Cart</button>
+        
+                        </div>
+                    <form v-on:submit.prevent="alert">
+                        <h4>Checkout</h4>
+                        <div>
+                            <label for="name">Name</label>
+                            <input type="text" id="name" v-model="name" v-on:input="validate">
+                            <small style="color:rgba(255, 0, 0, 0.233);" v-if="errors.name">{{errors.name}}</small>
+                        </div>
+
+                        <div>
+                            <label for="phone">Phone</label>
+                            <input type="text" id="phone" v-model="phone" v-on:input="validate">
+                            <small style="color:blueviolet;" v-if="errors.phone">{{errors.phone}}</small>
+                        </div>
+                        <button type="submit" v-show="valid == true">Checkout</button>
+                    </form>
+                        </main>
+
+                        <!-- Cart Container Ends -->
+        
+                        <!-- Checkout Container -->
+                        <main class="productContainer" v-show="checkout == true"> 
+                            <div v-for="product in cart">  
+                            <figure>
+                                <img v-bind:src="product.image">
+                            </figure>
+                            <h2 v-text ="product.title"></h2>
+                            <p v-html="product.description"></p>
+                        <!-- The double curly brackets is the shorter version of v-text -->
+                            <p><b>Subject:</b> {{product.subject}}</p>
+                            <p><b>Location:</b> {{product.location}}</p>
+                            <p><b>Price:</b> ${{product.price}}</p> 
+        
+
+                        </div>
+                        </main>
+                        <!-- Checkout Container Ends -->
+                    </div>
+            </div>
+        </div>
+
+    </div>
+    
+    
+   <script>
+        // const lessonData = require('./lessons.js');
+    //Instatiate a Vue object and set some values to it
+        var webstore = new Vue({
+    // Link Vue to the Div with an id of app
+            el: '#app',
+            data: {
+                showProduct: true,
+                sitename: null,
+                products: productdata,
+                cart: [], //array to store items in shopping cart
+                sortBy: 'subject',
+                orderBy: 'ascending',
+                name: "",
+                phone: "",
+                valid: false,
+                errors: {
+                    name: null,
+                    phone: null
+                },
+                checkout: false,
+                page: 'index',
+            },
+            methods:{
+                //Add to cart function which will take the product id and store it in cart
+                addToCart: function(product){
+                    // this.cart.forEach(  {
+                        
+                    // });
+                    this.cart.push({
+                        id: product.id,
+                        subject: product.subject,
+                        location: product.location,
+                        price: product.price,
+                        space: 1,
+                        image: product.image
+                    });
+                    product.space--
+                },
+                showCheckout: function(){
+                    this.showProduct = this.showProduct ? false : true;
+                    this.sitename = this.showProduct == true ? 'After School Activities' : "Shopping Cart"
+                },
+                 removeFromCart: function(product) {
+                    productIndex = this.cart.findIndex(function (item) {
+                        return item.id == product.id
+                    })
+
+                    if (productIndex > -1) {
+                        this.cart.splice(productIndex, 1)
+                    }
+                },
+                validate() {
+                    if (this.name.length <= 0 || this.name == "") {
+                        this.errors.name = "Please enter your name."
+                    } else if (this.phone.length <= 0 || this.phone == "") {
+                        this.errors.phone = "Please enter your phone number."
+                    }
+
+                    this.valid = false
+
+                    if (this.name.length > 0 && this.phone.length > 0) {
+                        this.valid = true
+                    }
+                },
+                alert() {
+                    alert('Checked Out Successfully')
+                    this.checkout = true
+                    this.sitename = "Checkout"
+                }
+   
+            },
+           
+            computed: {
+                //Sends the value of items in the cart array to the checkout button
+                cartItemCount: function(){
+                    return this.cart.length || '';
+                },
+                //Makes sure that there are enough items in the inventory. If not we'll disable
+                //the add to cart button.
+                canAddToCart: function(){
+                    return this.product.availableInventory > this.cartItemCount;
+                },
+                filteredProducts: function () {
+                   if (this.products) {
+                       if (this.orderBy == 'ascending') {
+                            if (this.sortBy == 'subject') {
+                                return this.products.sort(function (a, b) {
+                                    if (a.subject.toLowerCase() < b.subject.toLowerCase()) {
+                                        return -1
+                                    } else if (a.subject.toLowerCase() > b.subject.toLowerCase()) {
+                                        return 1
+                                    } else {
+                                        return 0
+                                    }
+                                })
+                            } else if (this.sortBy == 'location') {
+                                return this.products.sort(function (a, b) {
+                                    if (a.location.toLowerCase() < b.location.toLowerCase()) {
+                                        return -1
+                                    } else if (a.location.toLowerCase() > b.location.toLowerCase()) {
+                                        return 1
+                                    } else {
+                                        return 0
+                                    }
+                                })
+                            } else if (this.sortBy == 'price') {
+                                return this.products.sort(function (a, b) {
+                                    if (a.price < b.price) {
+                                        return -1
+                                    } else if (a.price > b.price) {
+                                        return 1
+                                    } else {
+                                        return 0
+                                    }
+                                })
+                            } else if (this.sortBy == 'availability') {
+                                if (a.space < b.space) {
+                                        return -1
+                                    } else if (a.space > b.space) {
+                                        return 1
+                                    } else {
+                                        return 0
+                                    }
+                            } 
+                       } else if (this.orderBy == 'descending') {
+                        if (this.sortBy == 'subject') {
+                                return this.products.sort(function (a, b) {
+                                    if (a.subject.toLowerCase() < b.subject.toLowerCase()) {
+                                        return 1
+                                    } else if (a.subject.toLowerCase() > b.subject.toLowerCase()) {
+                                        return -1
+                                    } else {
+                                        return 0
+                                    }
+                                })
+                            } else if (this.sortBy == 'location') {
+                                return this.products.sort(function (a, b) {
+                                    if (a.location.toLowerCase() < b.location.toLowerCase()) {
+                                        return 1
+                                    } else if (a.location.toLowerCase() > b.location.toLowerCase()) {
+                                        return -1
+                                    } else {
+                                        return 0
+                                    }
+                                })
+                            } else if (this.sortBy == 'price') {
+                                return this.products.sort(function (a, b) {
+                                    if (a.price < b.price) {
+                                        return 1
+                                    } else if (a.price > b.price) {
+                                        return -1
+                                    } else {
+                                        return 0
+                                    }
+                                })
+                            } else if (this.sortBy == 'availability') {
+                                if (a.space < b.space) {
+                                        return 1
+                                    } else if (a.space > b.space) {
+                                        return -1
+                                    } else {
+                                        return 0
+                                    }
+                            } 
+                       }
+                   }
+                }
+            }, 
+            mounted() {
+                this.sitename = 'After School Activities'
+            }
+
+        });
+    </script>
+    <style>
+        .productContainer{
+            flex-direction: row;
+            display: flex;
+            flex-wrap: wrap;
+        }
+    </style>
+</body>
+</html>
