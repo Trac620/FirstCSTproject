@@ -43,7 +43,7 @@ let productdata=[
         id: 1006,
         subject: "Social Studies",
         location: "Santorini",
-        price: 600,
+        price: 700,
         space: 5,
         image: "images/product-sos.jpg"
     },
