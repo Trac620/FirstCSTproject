@@ -11,7 +11,7 @@ let productdata=[
         id: 1002,
         subject: "Physics",
         location: "Lagos",
-        price: 500,
+        price: 750,
         space: 5,
         image: "images/product-phys.jpg"
     },
