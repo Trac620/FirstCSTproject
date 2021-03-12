@@ -59,7 +59,7 @@ let productdata=[
         id: 1008,
         subject: "Sex Education",
         location: "India",
-        price: 800,
+        price: 900,
         space: 5,
         image: "images/product-sexedu.jpg"
     },
