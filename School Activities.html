@@ -110,7 +110,7 @@
                         <div>
                             <label for="phone">Phone</label>
                             <input type="text" id="phone" v-model="phone" v-on:input="validate">
-                            <small style="color:black;" v-if="errors.phone">{{errors.phone}}</small>
+                            <small style="color:orange;" v-if="errors.phone">{{errors.phone}}</small>
                         </div>
                         <button type="submit" v-show="valid == true">Checkout</button>
                     </form>
