@@ -67,7 +67,7 @@ let productdata=[
         id: 1009,
         subject: "Civic Education",
         location: "Lagos",
-        price: 900,
+        price: 600,
         space: 5,
         image: "images/product-civic.jpg"
     },
