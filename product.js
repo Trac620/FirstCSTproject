@@ -75,7 +75,7 @@ let productdata=[
         id: 1010,
         subject: "Literature",
         location: "Isreal",
-        price: 200,
+        price: 250,
         space: 5,
         image: "images/product-lit-.jpg"
     }
